@@ -1,0 +1,32 @@
+{
+  "name": "sanskar-portfolio",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Portfolio for Sanskar Pandey - App & Software Developer. React + Vite front end with an Express API.",
+  "scripts": {
+    "css": "node scripts/build-css.mjs",
+    "css:watch": "node scripts/build-css.mjs --watch",
+    "dev": "node scripts/build-css.mjs && concurrently -k -n css,api,web -c yellow,magenta,cyan \"node scripts/build-css.mjs --watch\" \"node --watch server/index.js\" \"vite\"",
+    "build": "node scripts/build-css.mjs && vite build",
+    "start": "node server/index.js",
+    "preview": "vite preview",
+    "serve": "npm run build && npm start"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "framer-motion": "^14.9.1",
+    "lucide-react": "^1.69.0",
+    "nodemailer": "^10.3.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.4",
+    "@vitejs/plugin-react": "^6.2.1",
+    "concurrently": "^10.0.6",
+    "tailwindcss": "^4.3.4",
+    "vite": "^8.3.6"
+  }
+}
