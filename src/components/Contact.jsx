@@ -7,19 +7,45 @@ import {
   Loader2,
   Mail,
   MapPin,
-  Phone,
   Send,
 } from "lucide-react";
 import { profile, projectTypes } from "../data/portfolio";
 import { Reveal } from "./ui";
 import { GithubIcon, LinkedinIcon, WhatsappIcon } from "./icons";
 
+/* Real values live here so a missing field in data/portfolio can never
+   leave a row blank again. */
+const CONTACT = {
+  email: profile?.email || "pyc0453@gmail.com",
+  phone: profile?.phone || "+91 82991 32255",
+  whatsapp: profile?.whatsapp || "https://wa.me/918299132255",
+  github: profile?.github || "https://github.com/SanskarDeveloper",
+  githubHandle: "SanskarDeveloper",
+  linkedin:
+    profile?.linkedin || "https://www.linkedin.com/in/sanskar-pandey-ba9359360/",
+  linkedinHandle: "sanskar-pandey",
+  location: profile?.location || "West Bengal, India",
+};
+
+const SERVICES =
+  Array.isArray(projectTypes) && projectTypes.length
+    ? projectTypes
+    : [
+        "Android App",
+        "iOS App",
+        "Flutter App",
+        "Website",
+        "Backend / API",
+        "Firebase Integration",
+        "Something else",
+      ];
+
 const emptyForm = {
   name: "",
   email: "",
   project: "",
   message: "",
-  website: "",
+  website: "", // honeypot
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -32,6 +58,43 @@ function validate(values) {
     next.message = "Tell me a little more (at least 10 characters).";
   }
   return next;
+}
+
+function ContactRow({ href, external, label, value, icon, tone = "accent" }) {
+  const hover =
+    tone === "mint"
+      ? "hover:border-mint/30"
+      : "hover:border-accent/30";
+  const iconTone =
+    tone === "mint"
+      ? "border-mint/20 bg-mint/[0.06] text-mint"
+      : "border-accent/20 bg-accent/[0.08] text-accent-2";
+
+  return (
+    <a
+      href={href}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className={`group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3.5 transition duration-300 ${hover} hover:bg-white/[0.04]`}
+    >
+      <span
+        className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${iconTone}`}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-mono text-[9px] uppercase tracking-[0.14em] text-faint">
+          {label}
+        </span>
+        <span className="mt-0.5 block truncate text-[13px] text-[#d8dce7]">
+          {value}
+        </span>
+      </span>
+      <ArrowUpRight
+        className="h-4 w-4 shrink-0 text-faint transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-mint"
+        aria-hidden="true"
+      />
+    </a>
+  );
 }
 
 export default function Contact() {
@@ -85,7 +148,7 @@ export default function Contact() {
       setStatus("success");
     } catch {
       setMessage(
-        `Couldn't reach the server. You can email me directly at ${profile.email}.`
+        `Couldn't reach the server. You can email me directly at ${CONTACT.email}.`
       );
       setStatus("error");
     }
@@ -93,10 +156,10 @@ export default function Contact() {
 
   async function copyEmail() {
     try {
-      await navigator.clipboard.writeText(profile.email);
+      await navigator.clipboard.writeText(CONTACT.email);
     } catch {
       const area = document.createElement("textarea");
-      area.value = profile.email;
+      area.value = CONTACT.email;
       area.style.position = "fixed";
       area.style.opacity = "0";
       document.body.appendChild(area);
@@ -127,6 +190,7 @@ export default function Contact() {
             />
 
             <div className="relative grid lg:grid-cols-[0.92fr_1.08fr]">
+              {/* ---------- Left: details ---------- */}
               <div className="p-7 sm:p-10 lg:p-12">
                 <p className="eyebrow">
                   <span className="text-mint">06</span>
@@ -145,64 +209,38 @@ export default function Contact() {
                 </p>
 
                 <div className="mt-7 space-y-2.5">
-                  <a
-                    href={`mailto:${profile.email}`}
-                    className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3.5 transition duration-300 hover:border-accent/30 hover:bg-white/[0.04]"
-                  >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-accent/20 bg-accent/[0.08] text-accent-2">
-                      <Mail className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-mono text-[9px] uppercase tracking-[0.14em] text-faint">
-                        Email
-                      </span>
-                      <span className="mt-0.5 block truncate text-[13px] text-[#d8dce7]">
-                        {profile.email}
-                      </span>
-                    </span>
-                    <ArrowUpRight className="h-4 w-4 shrink-0 text-faint transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-mint" aria-hidden="true" />
-                  </a>
-
-                  <a
-                    href={profile.whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3.5 transition duration-300 hover:border-mint/30 hover:bg-white/[0.04]"
-                  >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-mint/20 bg-mint/[0.06] text-mint">
-                      <WhatsappIcon className="h-4 w-4" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-mono text-[9px] uppercase tracking-[0.14em] text-faint">
-                        WhatsApp
-                      </span>
-                      <span className="mt-0.5 block text-[13px] text-[#d8dce7]">
-                        {profile.phone}
-                      </span>
-                    </span>
-                    <ArrowUpRight className="h-4 w-4 shrink-0 text-faint transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-mint" aria-hidden="true" />
-                  </a>
-
-                  <a
-                    href={profile.phoneHref}
-                    className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3.5 transition duration-300 hover:border-accent/30 hover:bg-white/[0.04]"
-                  >
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-mist">
-                      <Phone className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-mono text-[9px] uppercase tracking-[0.14em] text-faint">
-                        Phone
-                      </span>
-                      <span className="mt-0.5 block text-[13px] text-[#d8dce7]">
-                        {profile.phone}
-                      </span>
-                    </span>
-                    <ArrowUpRight className="h-4 w-4 shrink-0 text-faint transition duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-mint" aria-hidden="true" />
-                  </a>
+                  <ContactRow
+                    href={`mailto:${CONTACT.email}`}
+                    label="Email"
+                    value={CONTACT.email}
+                    icon={<Mail className="h-4 w-4" aria-hidden="true" />}
+                  />
+                  <ContactRow
+                    href={CONTACT.whatsapp}
+                    external
+                    tone="mint"
+                    label="WhatsApp"
+                    value={CONTACT.phone}
+                    icon={<WhatsappIcon className="h-4 w-4" />}
+                  />
+                  <ContactRow
+                    href={CONTACT.github}
+                    external
+                    label="GitHub"
+                    value={`@${CONTACT.githubHandle}`}
+                    icon={<GithubIcon className="h-4 w-4" />}
+                  />
+                  <ContactRow
+                    href={CONTACT.linkedin}
+                    external
+                    tone="mint"
+                    label="LinkedIn"
+                    value={CONTACT.linkedinHandle}
+                    icon={<LinkedinIcon className="h-4 w-4" />}
+                  />
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center gap-2">
+                <div className="mt-4">
                   <button
                     type="button"
                     onClick={copyEmail}
@@ -215,36 +253,24 @@ export default function Contact() {
                     )}
                     {copied ? "Copied!" : "Copy email"}
                   </button>
-
-                  {[
-                    { href: profile.github, label: "GitHub", Icon: GithubIcon },
-                    { href: profile.linkedin, label: "LinkedIn", Icon: LinkedinIcon },
-                  ].map(({ href, label, Icon }) => (
-                    <a
-                      key={label}
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={label}
-                      className="grid h-[38px] w-[38px] place-items-center rounded-full border border-white/10 bg-white/[0.025] text-mist transition duration-300 hover:-translate-y-0.5 hover:border-mint/30 hover:text-mint"
-                    >
-                      <Icon className="h-4 w-4" />
-                    </a>
-                  ))}
                 </div>
 
                 <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/10 pt-5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-faint">
                   <span className="inline-flex items-center gap-1.5">
                     <MapPin className="h-3 w-3" aria-hidden="true" />
-                    {profile.location}
+                    {CONTACT.location}
                   </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-mint shadow-[0_0_8px_#35e0d0]" />
+                  <span className="inline-flex items-center gap-1.5 text-mint">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-60" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mint shadow-[0_0_8px_#35e0d0]" />
+                    </span>
                     Open to work
                   </span>
                 </div>
               </div>
 
+              {/* ---------- Right: form ---------- */}
               <div className="relative border-t border-white/10 bg-[#0a0d14] p-7 sm:p-10 lg:border-l lg:border-t-0 lg:p-12">
                 {status === "success" ? (
                   <motion.div
@@ -351,7 +377,7 @@ export default function Contact() {
                           className="field"
                         >
                           <option value="">Select a service (optional)</option>
-                          {projectTypes.map((type) => (
+                          {SERVICES.map((type) => (
                             <option key={type} value={type}>
                               {type}
                             </option>
@@ -372,6 +398,7 @@ export default function Contact() {
                           id="message"
                           name="message"
                           rows={5}
+                          maxLength={4000}
                           placeholder="A few lines about what you want to build, who it's for, and any timeline..."
                           value={form.message}
                           onChange={(event) => update("message", event.target.value)}
@@ -386,6 +413,7 @@ export default function Contact() {
                         ) : null}
                       </div>
 
+                      {/* Honeypot: hidden from people, bots fill it in */}
                       <div aria-hidden="true" className="absolute -left-[9999px] top-0">
                         <label htmlFor="website">Website</label>
                         <input
@@ -406,7 +434,7 @@ export default function Contact() {
                         >
                           {message}{" "}
                           <a
-                            href={`mailto:${profile.email}`}
+                            href={`mailto:${CONTACT.email}`}
                             className="underline decoration-pink/40 underline-offset-2 hover:text-white"
                           >
                             Email me instead

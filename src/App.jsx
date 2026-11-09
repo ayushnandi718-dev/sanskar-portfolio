@@ -9,7 +9,7 @@ import Skills from "./components/Skills";
 import Projects from "./components/Projects";
 import Experience from "./components/Experience";
 
-import ContactDetails from "./components/ContactDetails";
+import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import BackToTop from "./components/BackToTop";
 import ProjectModal from "./components/ProjectModal";
@@ -62,7 +62,7 @@ export default function App() {
         <Skills />
         <Projects onOpen={openProject} />
         <Experience />
-        <ContactDetails />
+        <Contact />
       </main>
 
       <Footer />
