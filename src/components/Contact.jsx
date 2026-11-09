@@ -1,15 +1,12 @@
 import { useRef, useState } from "react";
-import { motion } from "framer-motion";
 import {
   ArrowUpRight,
   Check,
   Copy,
-  Loader2,
   Mail,
   MapPin,
-  Send,
 } from "lucide-react";
-import { profile, projectTypes } from "../data/portfolio";
+import { profile } from "../data/portfolio";
 import { Reveal } from "./ui";
 import { GithubIcon, LinkedinIcon, WhatsappIcon } from "./icons";
 
@@ -27,44 +24,51 @@ const CONTACT = {
   location: profile?.location || "West Bengal, India",
 };
 
-const SERVICES =
-  Array.isArray(projectTypes) && projectTypes.length
-    ? projectTypes
-    : [
-        "Android App",
-        "iOS App",
-        "Flutter App",
-        "Website",
-        "Backend / API",
-        "Firebase Integration",
-        "Something else",
-      ];
+const STEPS = [
+  {
+    title: "Share the idea",
+    body: "Email or WhatsApp with what you want to build, who it's for, and your timeline.",
+  },
+  {
+    title: "Get a plan",
+    body: "I reply with scope, milestones and a clear quote. No obligation, no pressure.",
+  },
+  {
+    title: "Build & ship",
+    body: "Regular updates, tested builds, and a store-ready release at the end.",
+  },
+];
 
-const emptyForm = {
-  name: "",
-  email: "",
-  project: "",
-  message: "",
-  website: "", // honeypot
-};
+const FITS = [
+  "Android or Flutter app from scratch",
+  "New features for an existing app",
+  "Backend, API or Firebase work",
+  "A product or portfolio website",
+];
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const MAIL_BODY = [
+  "Hi Sanskar,",
+  "",
+  "I'd like to build:",
+  "",
+  "Who it's for:",
+  "",
+  "Timeline:",
+  "",
+  "Thanks!",
+].join("\n");
 
-function validate(values) {
-  const next = {};
-  if (values.name.trim().length < 2) next.name = "Please enter your name.";
-  if (!EMAIL_RE.test(values.email.trim())) next.email = "Enter a valid email address.";
-  if (values.message.trim().length < 10) {
-    next.message = "Tell me a little more (at least 10 characters).";
-  }
-  return next;
-}
+const MAILTO = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
+  "Project enquiry — Sanskar"
+)}&body=${encodeURIComponent(MAIL_BODY)}`;
+
+const WHATSAPP = `${CONTACT.whatsapp}?text=${encodeURIComponent(
+  "Hi Sanskar, I'd like to talk about a project."
+)}`;
 
 function ContactRow({ href, external, label, value, icon, tone = "accent" }) {
   const hover =
-    tone === "mint"
-      ? "hover:border-mint/30"
-      : "hover:border-accent/30";
+    tone === "mint" ? "hover:border-mint/30" : "hover:border-accent/30";
   const iconTone =
     tone === "mint"
       ? "border-mint/20 bg-mint/[0.06] text-mint"
@@ -98,61 +102,8 @@ function ContactRow({ href, external, label, value, icon, tone = "accent" }) {
 }
 
 export default function Contact() {
-  const [form, setForm] = useState(emptyForm);
-  const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("idle");
-  const [message, setMessage] = useState("");
-  const [sentTo, setSentTo] = useState("");
   const [copied, setCopied] = useState(false);
   const copyTimer = useRef(null);
-
-  function update(field, value) {
-    setForm((current) => ({ ...current, [field]: value }));
-    if (errors[field]) {
-      setErrors((current) => ({ ...current, [field]: undefined }));
-    }
-    if (status === "error") {
-      setStatus("idle");
-      setMessage("");
-    }
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    const validation = validate(form);
-    setErrors(validation);
-
-    if (Object.keys(validation).length) return;
-
-    setStatus("sending");
-    setMessage("");
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        if (data.errors) setErrors(data.errors);
-        setMessage(data.message || "Something went wrong. Please try again.");
-        setStatus("error");
-        return;
-      }
-
-      setSentTo(form.email.trim());
-      setForm(emptyForm);
-      setStatus("success");
-    } catch {
-      setMessage(
-        `Couldn't reach the server. You can email me directly at ${CONTACT.email}.`
-      );
-      setStatus("error");
-    }
-  }
 
   async function copyEmail() {
     try {
@@ -172,8 +123,6 @@ export default function Contact() {
     window.clearTimeout(copyTimer.current);
     copyTimer.current = window.setTimeout(() => setCopied(false), 2200);
   }
-
-  const busy = status === "sending";
 
   return (
     <section id="contact" className="scroll-mt-24 py-24 sm:py-28 lg:py-32">
@@ -270,202 +219,112 @@ export default function Contact() {
                 </div>
               </div>
 
-              {/* ---------- Right: form ---------- */}
+              {/* ---------- Right: start a project ---------- */}
               <div className="relative border-t border-white/10 bg-[#0a0d14] p-7 sm:p-10 lg:border-l lg:border-t-0 lg:p-12">
-                {status === "success" ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex min-h-[420px] flex-col items-center justify-center text-center"
-                  >
-                    <motion.span
-                      initial={{ scale: 0.6, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
-                      className="grid h-16 w-16 place-items-center rounded-full border border-mint/30 bg-mint/10 text-mint shadow-[0_0_40px_-10px_rgba(53,224,208,0.5)]"
-                    >
-                      <Check className="h-7 w-7" aria-hidden="true" />
-                    </motion.span>
-                    <h3 className="mt-5 font-display text-2xl font-bold tracking-[-0.03em]">
-                      Message sent.
-                    </h3>
-                    <p className="mt-2 max-w-sm text-[13px] leading-6 text-mist">
-                      Thanks for reaching out. I'll get back to you at{" "}
-                      <span className="text-white">{sentTo}</span> as soon as I can.
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <h3 className="font-display text-lg font-semibold tracking-[-0.02em]">
+                    Start a project
+                  </h3>
+                  <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-mint">
+                    <span className="h-1.5 w-1.5 rounded-full bg-mint shadow-[0_0_8px_#35e0d0]" />
+                    Accepting work
+                  </span>
+                </div>
+
+                <p className="mt-3 max-w-md text-[13px] leading-6 text-mist">
+                  No forms. Tell me what you're building and I'll reply with the
+                  next step.
+                </p>
+
+                <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+                  <div className="flex items-center gap-1.5 border-b border-white/10 px-4 py-2.5">
+                    <span className="h-2 w-2 rounded-full bg-pink/70" />
+                    <span className="h-2 w-2 rounded-full bg-accent/70" />
+                    <span className="h-2 w-2 rounded-full bg-mint/70" />
+                    <span className="ml-2 font-mono text-[9px] uppercase tracking-[0.14em] text-faint">
+                      sanskar — zsh
+                    </span>
+                  </div>
+                  <div className="space-y-1 px-4 py-4 font-mono text-[11.5px] leading-6 text-mist">
+                    <p>
+                      <span className="text-mint">$</span> whoami
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStatus("idle");
-                        setForm(emptyForm);
-                      }}
-                      className="btn btn-ghost btn-sm mt-6"
-                    >
-                      Send another message
-                    </button>
-                  </motion.div>
-                ) : (
-                  <>
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h3 className="font-display text-lg font-semibold tracking-[-0.02em]">
-                        Tell me about your project
-                      </h3>
-                      <span className="inline-flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-mint">
-                        <span className="h-1.5 w-1.5 rounded-full bg-mint shadow-[0_0_8px_#35e0d0]" />
-                        Accepting work
-                      </span>
-                    </div>
+                    <p className="pl-3 text-white">
+                      sanskar-pandey · app &amp; software developer
+                    </p>
+                    <p>
+                      <span className="text-mint">$</span> status
+                    </p>
+                    <p className="pl-3 text-white">{profile.availability}</p>
+                    <p>
+                      <span className="text-mint">$</span> location
+                    </p>
+                    <p className="pl-3 text-white">{CONTACT.location}</p>
+                    <p>
+                      <span className="text-mint">$</span>{" "}
+                      <span className="inline-block h-3.5 w-1.5 animate-pulse bg-mint align-middle" />
+                    </p>
+                  </div>
+                </div>
 
-                    <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div>
-                          <label className="field-label" htmlFor="name">
-                            Your name
-                          </label>
-                          <input
-                            id="name"
-                            name="name"
-                            type="text"
-                            autoComplete="name"
-                            placeholder="Jane Doe"
-                            value={form.name}
-                            onChange={(event) => update("name", event.target.value)}
-                            aria-invalid={Boolean(errors.name)}
-                            aria-describedby={errors.name ? "name-error" : undefined}
-                            className={`field ${errors.name ? "field-error" : ""}`}
-                          />
-                          {errors.name ? (
-                            <p id="name-error" className="field-message">
-                              {errors.name}
-                            </p>
-                          ) : null}
-                        </div>
-
-                        <div>
-                          <label className="field-label" htmlFor="email">
-                            Email
-                          </label>
-                          <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            autoComplete="email"
-                            placeholder="jane@company.com"
-                            value={form.email}
-                            onChange={(event) => update("email", event.target.value)}
-                            aria-invalid={Boolean(errors.email)}
-                            aria-describedby={errors.email ? "email-error" : undefined}
-                            className={`field ${errors.email ? "field-error" : ""}`}
-                          />
-                          {errors.email ? (
-                            <p id="email-error" className="field-message">
-                              {errors.email}
-                            </p>
-                          ) : null}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="field-label" htmlFor="project">
-                          What do you need?
-                        </label>
-                        <select
-                          id="project"
-                          name="project"
-                          value={form.project}
-                          onChange={(event) => update("project", event.target.value)}
-                          className="field"
-                        >
-                          <option value="">Select a service (optional)</option>
-                          {SERVICES.map((type) => (
-                            <option key={type} value={type}>
-                              {type}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <label className="field-label" htmlFor="message">
-                            Project details
-                          </label>
-                          <span className="mb-2 font-mono text-[9px] text-faint">
-                            {form.message.length}/4000
+                <div className="mt-7">
+                  <p className="eyebrow">How it works</p>
+                  <ol className="mt-4 space-y-4">
+                    {STEPS.map((step, index) => (
+                      <li key={step.title} className="flex gap-3">
+                        <span className="mt-0.5 font-mono text-[10px] text-mint">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span>
+                          <span className="block text-[13px] font-semibold text-white">
+                            {step.title}
                           </span>
-                        </div>
-                        <textarea
-                          id="message"
-                          name="message"
-                          rows={5}
-                          maxLength={4000}
-                          placeholder="A few lines about what you want to build, who it's for, and any timeline..."
-                          value={form.message}
-                          onChange={(event) => update("message", event.target.value)}
-                          aria-invalid={Boolean(errors.message)}
-                          aria-describedby={errors.message ? "message-error" : undefined}
-                          className={`field resize-none ${errors.message ? "field-error" : ""}`}
-                        />
-                        {errors.message ? (
-                          <p id="message-error" className="field-message">
-                            {errors.message}
-                          </p>
-                        ) : null}
-                      </div>
+                          <span className="mt-0.5 block text-[12px] leading-5 text-mist">
+                            {step.body}
+                          </span>
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
 
-                      {/* Honeypot: hidden from people, bots fill it in */}
-                      <div aria-hidden="true" className="absolute -left-[9999px] top-0">
-                        <label htmlFor="website">Website</label>
-                        <input
-                          id="website"
-                          name="website"
-                          type="text"
-                          tabIndex={-1}
-                          autoComplete="off"
-                          value={form.website}
-                          onChange={(event) => update("website", event.target.value)}
-                        />
-                      </div>
-
-                      {status === "error" && message ? (
-                        <div
-                          role="alert"
-                          className="rounded-xl border border-pink/20 bg-pink/[0.06] px-4 py-3 text-[12px] leading-5 text-[#ffc1cd]"
-                        >
-                          {message}{" "}
-                          <a
-                            href={`mailto:${CONTACT.email}`}
-                            className="underline decoration-pink/40 underline-offset-2 hover:text-white"
-                          >
-                            Email me instead
-                          </a>
-                        </div>
-                      ) : null}
-
-                      <button
-                        type="submit"
-                        disabled={busy}
-                        className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60"
+                <div className="mt-7">
+                  <p className="eyebrow">Good fit if you need</p>
+                  <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                    {FITS.map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-2 text-[12px] leading-5 text-mist"
                       >
-                        {busy ? (
-                          <>
-                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            Send message
-                            <Send aria-hidden="true" />
-                          </>
-                        )}
-                      </button>
+                        <Check
+                          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-mint"
+                          aria-hidden="true"
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-                      <p className="text-center font-mono text-[9px] leading-5 text-faint">
-                        Your details stay private. No spam, ever.
-                      </p>
-                    </form>
-                  </>
-                )}
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <a href={MAILTO} className="btn btn-primary flex-1">
+                    Email me
+                    <ArrowUpRight aria-hidden="true" />
+                  </a>
+                  <a
+                    href={WHATSAPP}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-ghost flex-1"
+                  >
+                    <WhatsappIcon className="h-4 w-4" />
+                    WhatsApp
+                  </a>
+                </div>
+
+                <p className="mt-3 text-center font-mono text-[9px] leading-5 text-faint">
+                  No forms, no spam — just a direct reply.
+                </p>
               </div>
             </div>
           </div>

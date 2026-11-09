@@ -96,7 +96,7 @@ export default function Footer() {
           <p className="flex flex-wrap items-center gap-2 text-[11px] text-faint">
             Made by
             <a
-              href="https://aux-studio.vercel.app"
+              href="https://auxstudio.dpdns.org"
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.1em] text-mist transition hover:text-mint"

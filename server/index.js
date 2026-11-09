@@ -1,17 +1,13 @@
 /**
  * Local development / self-hosted production server.
  *
- * Vercel deploys the frontend statically and `api/contact.js` as a
- * serverless function. This Express server mirrors that behaviour locally
- * (Vite proxies /api here during `npm run dev`) and can also serve the
- * built `dist` folder with `npm start`.
+ * The site is fully static, so this server only serves the built `dist`
+ * folder and a health check. Vite proxies /api here during `npm run dev`.
  */
 import "dotenv/config";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-
-import contactHandler from "../api/contact.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -30,13 +26,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "32kb" }));
-
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
-
-app.all("/api/contact", contactHandler);
 
 app.use("/api", (_req, res) => {
   res.status(404).json({ message: "Not found." });
@@ -70,5 +62,5 @@ app.use((error, _req, res, _next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`API + site listening on http://localhost:${PORT}`);
+  console.log(`Site listening on http://localhost:${PORT}`);
 });
