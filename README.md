@@ -1,172 +1,187 @@
-# Sanskar Pandey - Portfolio
+# Sanskar Pandey Portfolio
 
-A modern, interactive portfolio for **Sanskar Pandey**, an app and software developer.
-Built with **React 19 + Vite + Tailwind CSS v4** on the front end and a small
-**Express** API for the contact form.
+A modern portfolio website for Sanskar Pandey - App & Software Developer, built with React 19, Vite 8, and Tailwind v4. The portfolio showcases Android, iOS, and Flutter applications, services, projects, and contact information.
 
-Dark, developer-focused interface with an aurora backdrop, cursor glow, scroll
-reveals, magnetic buttons, a 3D tilt code card, animated counters, tabbed skill
-groups, and full project case-study modals with keyboard navigation.
+## 📋 Overview
 
----
+This portfolio features:
+- **Dark theme** with custom accents and morphing background effects
+- **AI-powered customer support** (SP Assistant) with LangChain, Groq primary LLM, and NVIDIA fallback
+- **Structured knowledge base** for accurate, factual responses about the portfolio
+- **Lead qualification** flow without form submissions
+- **Chat widget** in the bottom-right corner for AI interactions
+- **Contact details** replacing the traditional contact form
+- **3D rotating projects** with modals
+- **Full responsiveness** from mobile to desktop
 
-## Tech stack
+## 🚀 Getting Started
 
-| Layer      | Tools                                                          |
-| ---------- | -------------------------------------------------------------- |
-| Front end  | React 19, Vite 8, Tailwind CSS v4, Framer Motion, Lucide icons |
-| Backend    | Node.js, Express 5, Nodemailer, dotenv                         |
-| Fonts      | Space Grotesk, Inter, JetBrains Mono (Google Fonts)            |
-| Contact    | Optional SMTP email + local JSON storage fallback              |
+### Prerequisites
 
----
+- Node.js (v18 or newer)
+- npm, yarn, or pnpm
+- Groq API key (for primary LLM) - optional: NVIDIA API key (for fallback)
 
-## Getting started
+### Installation
 
-Requirements: **Node.js 20+** and npm.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SanskarDeveloper/portfolio.git
+   cd portfolio
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   Copy the `.env.example` file and fill in the required values:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Configure API keys** (edit `.env`):
+   ```env
+   # Server
+   PORT=8787
+
+   # Contact form (optional - messages saved to data/messages.json without these)
+   SMTP_HOST=
+   SMTP_PORT=587
+   SMTP_SECURE=false
+   SMTP_USER=
+   SMTP_PASS=
+   CONTACT_TO=pyc0453@gmail.com
+   CONTACT_FROM=
+
+   # AI Assistant - REQUIRED for LLM responses
+   GROQ_API_KEY=your_groq_key_here
+   GROQ_MODEL=llama-3.1-70b-versatile
+
+   # Optional NVIDIA fallback
+   NVIDIA_API_KEY=your_nvidia_key_here
+   NVIDIA_MODEL=nvidia
+
+   # Alternative: If only NVIDIA key is available
+   # GROQ_API_KEY=
+   # NVIDIA_API_KEY=your_nvidia_key_here
+   ```
+
+### Running the project
 
 ```bash
-npm install
+# Development mode (Vite + Express API)
 npm run dev
+
+# Or start separately:
+# Terminal 1: npm run dev (starts Vite)
+# Terminal 2: node server/index.js (starts Express API)
 ```
 
-- Web app: <http://localhost:5173>
-- API: <http://localhost:8787>
-- Vite proxies `/api` requests to the Express server.
+Available scripts:
+- `npm run dev` - Starts Vite dev server and Express API concurrently
+- `npm run dev:css` - Watch CSS build
+- `npm run dev:api` - Start Express API server
+- `npm run dev:web` - Start Vite web server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm preview` - Preview production build
 
-### Production build
+## 🤖 AI Assistant (SP Assistant)
 
-```bash
-npm run build
-npm start
+The portfolio includes an AI customer-support assistant powered by LangChain:
+
+### How it works
+
+- **Primary provider**: Groq (fast Llama models)
+- **Fallback provider**: NVIDIA (optional)
+- **Knowledge base**: Structured documents (not vector DB) containing verified portfolio information
+- **Response filtering**: Only uses verified information from the knowledge base
+- **Lead qualification**: Collects user interest without form submissions
+
+### Environment variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GROQ_API_KEY` | Yes (for Groq) | Your Groq API key |
+| `GROQ_MODEL` | No | Groq model name (default: `llama-3.1-70b-versatile`) |
+| `NVIDIA_API_KEY` | No | NVIDIA API key (for fallback) |
+| `NVIDIA_MODEL` | No | NVIDIA model name (default: `nvidia`) |
+
+### API endpoint
+
+```
+POST /api/assistant
+Body: { "message": "your question", "conversationId": "optional" }
 ```
 
-`npm start` serves the built `dist/` folder and the API from
-<http://localhost:8787> on a single port. Use `npm run serve` to build and start
-in one command.
+Responses include:
+- `status`: "ok", "unavailable", "error", or "rate_limited"
+- `message`: The assistant's response
+- `provider`: "groq" or "nvidia"
+- `model`: The model name used
 
-### Available scripts
+### Knowledge base
 
-| Script  | Description                                         |
-| ------- | --------------------------------------------------- |
-| `dev`   | API with file watching + Vite dev server            |
-| `build` | Production build into `dist/`                       |
-| `start` | Run the Express server (serves `dist/` and the API) |
-| `serve` | `build` followed by `start`                         |
-| `preview` | Preview the Vite build locally                    |
+The assistant uses a structured knowledge base at `src/lib/ai/knowledge-base.ts` with 8 categorized documents:
+- personal, services, projects, technical skills, contact, experience, FAQ
 
----
+Responses are filtered to only include verified information from these documents.
 
-## Contact form
+## 📦 Project Structure
 
-The form posts to `POST /api/contact`.
-
-- Validates name, email and message on both client and server.
-- Rate limits to **5 submissions per 10 minutes per IP**.
-- Uses a hidden honeypot field to reject basic bots.
-- Always stores submissions in `data/messages.json` (git-ignored).
-- Sends an email when SMTP credentials are present.
-
-### Optional email delivery
-
-Copy `.env.example` to `.env` and fill in your mail provider details:
-
-```ini
-PORT=8787
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=your-address@gmail.com
-SMTP_PASS=your-app-password
-CONTACT_TO=pyc0453@gmail.com
-CONTACT_FROM=your-address@gmail.com
 ```
-
-For Gmail, use an **App Password** rather than your account password. Without
-SMTP values, messages are still saved locally and the health endpoint reports
-`"email": "stored"`. Check `GET /api/health` to confirm the running mode.
-
----
-
-## Project structure
-
-```text
-.
-├── index.html              # Meta tags, fonts, JSON-LD, favicon
-├── vite.config.js          # React + Tailwind plugins, /api proxy
-├── public/
-│   └── favicon.svg
-├── server/
-│   └── index.js            # Express API, validation, rate limit, static host
+1/
 ├── src/
-│   ├── main.jsx
-│   ├── App.jsx             # Section composition, scroll progress, modal state
-│   ├── index.css           # Tailwind theme, components, animations
-│   ├── data/
-│   │   └── portfolio.js    # Profile, services, projects, skills, experience
-│   └── components/
-│       ├── Header.jsx      # Sticky nav, active-section pill, mobile menu
-│       ├── Hero.jsx        # Intro, stats, socials, marquee
-│       ├── DevCard.jsx     # Tabbed code window with copy + typewriter
-│       ├── About.jsx
-│       ├── Services.jsx
-│       ├── Skills.jsx
-│       ├── Projects.jsx    # Tilt cards + case-study trigger
-│       ├── ProjectModal.jsx
-│       ├── Experience.jsx
-│       ├── Contact.jsx
-│       ├── Footer.jsx      # Includes AUX STUDIO credit
-│       ├── ui.jsx          # Reveal, Magnetic, SpotlightCard, Counter, etc.
-│       └── icons.jsx       # Brand icons (GitHub, LinkedIn, WhatsApp, Play)
-└── .env.example
+│   ├── components/          # UI components
+│   │   ├── Header.jsx
+│   │   ├── Hero.jsx
+│   │   ├── About.jsx
+│   │   ├── Services.jsx
+│   │   ├── Skills.jsx
+│   │   ├── Projects.jsx
+│   │   ├── Experience.jsx
+│   │   ├── ContactDetails.jsx  # Replaces contact form
+│   │   ├── Footer.jsx
+│   │   ├── BackToTop.jsx
+│   │   └── ChatWidget.jsx       # AI chat widget
+│   ├── data/                # Portfolio data (portfolio.js)
+│   ├── lib/
+│   │   └── ai/
+│   │       └── knowledge-base.ts  # Structured knowledge base
+│   └── App.jsx              # Main app component
+├── server/
+│   ├── index.js             # Express server with AI route
+│   └── api/
+│       └── assistant.ts       # AI assistant API logic
+├── .env.example
+├── package.json
+└── vite.config.js
 ```
 
-All editable content lives in `src/data/portfolio.js` - update profile links,
-services, projects, skills and experience there.
+## ✨ Features
 
----
+- **AI chat widget** - Floating button in bottom-right, opens overlay with conversation history
+- **Lead qualification** - AI assistant collects user name/email for follow-up without form submission
+- **Structured knowledge base** - 8 categorized documents with verified portfolio information
+- **Groq primary, NVIDIA fallback** - Seamless provider switching
+- **Zod validation** - Request validation on the API route
+- **Conversation memory** - Maintains history per conversation ID
+- **Rate limiting** - 5 submissions per 10 minutes per IP
+- **Secure API keys** - Server-side only, never exposed to client
+- **Contact details** - Email, WhatsApp, GitHub, LinkedIn (no form submission)
+- **All existing portfolio sections functional** - About, Services, Projects, Experience, Skills
 
-## Editing content
+## 🛠️ Technology Stack
 
-- **Profile & links** - `profile` in `src/data/portfolio.js`.
-- **Services** - `services` array (icon keys map to Lucide icons in `Services.jsx`).
-- **Projects** - `projects` array. Each entry includes accent colours, a
-  `rotation` value for the phone mockup, case-study copy and a Play Store link.
-- **Skills / experience / marquee** - matching arrays in the same file.
-- **Metadata** - `index.html` (`<title>`, description, Open Graph, JSON-LD).
+- **Frontend**: React 19, Vite 8, Framer Motion 14, Tailwind v4
+- **Backend**: Express 5, Node.js
+- **AI**: LangChain, @langchain/groq, OpenAI compatibility
+- **Validation**: Zod
+- **Icons**: Lucide React
+- **Styling**: Tailwind v4 with custom dark theme colors
 
----
+## 📄 License
 
-## Deployment
-
-Any Node host works (Render, Railway, Fly.io, a VPS, etc.):
-
-1. Build command: `npm install && npm run build`
-2. Start command: `npm start`
-3. Set `PORT` if the platform requires it, plus the optional SMTP variables.
-4. Persist the `data/` directory if you want stored messages to survive
-   redeploys (or rely on SMTP delivery).
-
-The app is a standard static SPA plus one API route, so a platform that runs
-Node is the simplest option. `dist/` is generated and should not be committed.
-
----
-
-## Notes & caveats
-
-- No personal photo or résumé is included; the site uses an initials-based
-  identity. A résumé can be provided on request.
-- The exact Firebase technologies used by **NMJ** and **ApnaFood** have not been
-  independently verified, so those projects list only **Android + Firebase**.
-  **ApplyZ** includes the fuller Kotlin / Compose / Firestore stack.
-- Phone numbers, email and social links are taken from the details provided by
-  Sanskar. Double-check them before publishing.
-
----
-
-## Credits
-
-Designed and built with care. Footer credit:
-**Made by [AUX STUDIO](https://aux-studio.vercel.app)**.
-
-© Sanskar Pandey. All rights reserved.
+MIT

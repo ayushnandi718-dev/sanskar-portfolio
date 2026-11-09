@@ -14,9 +14,12 @@ const socials = [
 
 export default function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden pt-32 sm:pt-36">
-      <div className="shell grid gap-14 pb-16 lg:grid-cols-[1.04fr_0.96fr] lg:items-center lg:gap-10 lg:pb-24">
-        <div className="relative z-10">
+    <section
+      id="top"
+      className="relative isolate overflow-x-clip pt-28 sm:pt-32 lg:pt-36"
+    >
+      <div className="shell relative grid min-w-0 grid-cols-1 items-center gap-14 pb-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:pb-28">
+        <div className="relative z-10 mx-auto w-full max-w-2xl lg:mx-0">
           <Reveal>
             <a
               href="#contact"
@@ -112,7 +115,10 @@ export default function Hero() {
           </Reveal>
         </div>
 
-        <Reveal delay={0.15} className="relative z-0">
+        <Reveal
+          delay={0.15}
+          className="relative z-10 mx-auto w-full min-w-0 max-w-[620px]"
+        >
           <DevCard />
         </Reveal>
       </div>

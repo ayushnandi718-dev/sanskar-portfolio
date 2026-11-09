@@ -20,11 +20,12 @@ export default function DevCard() {
 
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
-  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [6, -6]), {
+  // Reduced rotation ranges so the character stays centered & doesn't fly off-screen
+  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [3, -3]), {
     stiffness: 180,
     damping: 20,
   });
-  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-7, 7]), {
+  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-4, 4]), {
     stiffness: 180,
     damping: 20,
   });
@@ -63,10 +64,20 @@ export default function DevCard() {
   }
 
   return (
-    <div className="relative" style={{ perspective: 1200 }}>
+    <div
+      className="relative isolate mx-auto w-full min-w-0 max-w-[620px]"
+      style={{ perspective: "1200px" }}
+    >
+      {/* Ambient lighting */}
       <div
         aria-hidden="true"
-        className="absolute -inset-10 -z-10 rounded-full bg-[radial-gradient(circle,rgba(139,124,255,0.2),transparent_62%)] blur-3xl"
+        className="pointer-events-none absolute -inset-8 z-0 rounded-[40px] bg-[radial-gradient(ellipse_at_center,rgba(139,124,255,0.18),rgba(53,224,208,0.06)_45%,transparent_72%)] blur-2xl"
+      />
+
+      {/* Decorative frame */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-px z-0 rounded-[19px] border border-white/[0.07]"
       />
 
       <motion.div
@@ -75,9 +86,9 @@ export default function DevCard() {
         style={
           reduce
             ? undefined
-            : { rotateX, rotateY, transformStyle: "preserve-3d" }
+            : { rotateX, rotateY, transformOrigin: "center", transformStyle: "preserve-3d" }
         }
-        className="code-window relative overflow-hidden rounded-2xl border border-white/15"
+        className="code-window relative z-10 w-full min-w-0 overflow-hidden rounded-2xl border border-white/[0.14] shadow-[0_30px_100px_-35px_rgba(0,0,0,0.95),0_0_45px_-25px_rgba(139,124,255,0.35)]"
       >
         <div className="flex items-center gap-2 border-b border-white/10 bg-white/[0.02] px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/90" />
